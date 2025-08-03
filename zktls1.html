@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive ZK-TLS Protocol Explorer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chosen Palette: Tech Neutral -->
+    <!-- Application Structure Plan: The SPA is designed as an interactive dashboard, not a linear report. A sticky top navigation allows users to jump between four key thematic sections: 'Introduction' (for context), 'Architectures' (for high-level comparison), 'Protocol Explorer' (the core interactive element for deep dives), and 'Future Trends' (for outlook). This task-oriented structure prioritizes user exploration over the original report's sequential format. The 'Protocol Explorer' uses a button-based selector to dynamically update a content area with text, a data table, and a radar chart. This interaction model was chosen to make the dense, comparative data on multiple protocols easily accessible and visually digestible, allowing users to quickly contrast different solutions based on key metrics without extensive scrolling. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Core zkTLS concepts -> Goal: Inform -> Viz: Icon-based cards (HTML/CSS) -> Interaction: None -> Justification: Breaks up introductory text, making foundational concepts more scannable and visually appealing.
+        - Report Info: Architectural Models (MPC, TEE, Proxy) Pros/Cons -> Goal: Compare -> Viz: 3-column layout with pros/cons lists -> Interaction: Buttons to filter views -> Justification: Facilitates direct, side-by-side comparison of the core trade-offs.
+        - Report Info: Detailed data for 9 protocols -> Goal: Explore/Compare -> Viz: Radar chart (Chart.js) and dynamic HTML table -> Interaction: User selects a protocol via buttons to update both the chart and table -> Justification: The radar chart provides an instant, multi-dimensional visual summary of a protocol's strengths (Security, Performance, etc.). The dynamic table provides detailed, structured data. This combination caters to both quick visual analysis and in-depth review.
+        - Report Info: Future outlook topics -> Goal: Organize -> Viz: Tabbed content area (HTML/JS) -> Interaction: User clicks tabs to switch content -> Justification: Organizes concluding text into digestible, thematic chunks, improving readability.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 40vh;
+            width: 80vw;
+            max-width: 500px;
+            max-height: 400px;
+        }
+        .nav-link {
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .active-nav {
+            color: #0891b2;
+            border-bottom-color: #0891b2;
+        }
+        .section-fade-in {
+            animation: fadeIn 0.8s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 border-b border-slate-200">
+        <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-cyan-700">zkTLS Explorer</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#introduction" class="nav-link text-slate-600 hover:text-cyan-600 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">Introduction</a>
+                        <a href="#architectures" class="nav-link text-slate-600 hover:text-cyan-600 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">Architectures</a>
+                        <a href="#explorer" class="nav-link text-slate-600 hover:text-cyan-600 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">Protocol Explorer</a>
+                        <a href="#trends" class="nav-link text-slate-600 hover:text-cyan-600 px-3 py-2 rounded-md text-sm font-medium border-b-2 border-transparent">Future Trends</a>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section id="introduction" class="mb-16 md:mb-24 section-fade-in">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-slate-900 tracking-tight">Verifying Web Content with zkTLS</h1>
+                <p class="mt-4 max-w-3xl mx-auto text-lg text-slate-600">An interactive guide to Zero-Knowledge Transport Layer Security, a technology bridging Web2 data with Web3's trustless environment by solving the "Oracle Problem."</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <div class="flex items-center justify-center h-12 w-12 rounded-full bg-cyan-100 text-cyan-600 mb-4">
+                        <span class="text-2xl">🛡️</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Privacy-Preserving</h3>
+                    <p class="text-slate-600">Users can prove facts about their web data (e.g., age, creditworthiness) without revealing the underlying sensitive information, thanks to selective disclosure via Zero-Knowledge Proofs.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <div class="flex items-center justify-center h-12 w-12 rounded-full bg-cyan-100 text-cyan-600 mb-4">
+                        <span class="text-2xl">✅</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Verifiability & Integrity</h3>
+                    <p class="text-slate-600">Generates cryptographic proof that data was fetched from a specific server via a valid TLS session, guaranteeing its origin and that it hasn't been tampered with.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100">
+                    <div class="flex items-center justify-center h-12 w-12 rounded-full bg-cyan-100 text-cyan-600 mb-4">
+                        <span class="text-2xl">🔗</span>
+                    </div>
+                    <h3 class="text-lg font-semibold text-slate-900 mb-2">Permissionless Integration</h3>
+                    <p class="text-slate-600">Liberates data from Web2 silos for use in Web3 applications without needing server-side changes or API access, making any HTTPS data source usable on-chain.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="architectures" class="mb-16 md:mb-24 section-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Foundational zkTLS Architectures</h2>
+                <p class="mt-3 max-w-2xl mx-auto text-lg text-slate-600">zkTLS protocols are built on three primary models, each with distinct trade-offs in security, performance, and trust.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-100 flex flex-col">
+                    <h3 class="text-xl font-bold text-center text-cyan-700 mb-4">MPC-based</h3>
+                    <p class="text-slate-600 mb-4 text-sm flex-grow">Multiple parties collaboratively perform the TLS handshake, secret-sharing keys so no single entity sees the plaintext data. Strong security through decentralization.</p>
+                    <div class="space-y-3">
+                        <p class="font-semibold text-green-600">👍 Pros:</p>
+                        <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
+                            <li>Strong, decentralized security</li>
+                            <li>No single point of failure</li>
+                            <li>Enhanced privacy (secret-shared info)</li>
+                        </ul>
+                        <p class="font-semibold text-red-600">👎 Cons:</p>
+                        <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
+                            <li>High networking overhead, slower</li>
+                            <li>Potential for node collusion</li>
+                            <li>Can be complex to support TLS 1.3</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-100 flex flex-col">
+                    <h3 class="text-xl font-bold text-center text-cyan-700 mb-4">TEE-based</h3>
+                    <p class="text-slate-600 mb-4 text-sm flex-grow">Uses a hardware "secure enclave" (like Intel SGX) to process sensitive data in an isolated, tamper-proof environment. Very efficient.</p>
+                    <div class="space-y-3">
+                        <p class="font-semibold text-green-600">👍 Pros:</p>
+                        <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
+                            <li>Highly efficient, low latency</li>
+                            <li>Robust hardware-level isolation</li>
+                            <li>Minimal computational overhead</li>
+                        </ul>
+                        <p class="font-semibold text-red-600">👎 Cons:</p>
+                        <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
+                            <li>Relies on trusting hardware manufacturer</li>
+                            <li>Centralization risk (single vendor)</li>
+                            <li>Potential for side-channel attacks</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-100 flex flex-col">
+                    <h3 class="text-xl font-bold text-center text-cyan-700 mb-4">Proxy-based</h3>
+                    <p class="text-slate-600 mb-4 text-sm flex-grow">An intermediary "opaque" proxy observes encrypted traffic without decrypting it. The user generates a proof based on this observed session. Simple and fast.</p>
+                    <div class="space-y-3">
+                        <p class="font-semibold text-green-600">👍 Pros:</p>
+                        <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
+                            <li>Very fast and efficient</li>
+                            <li>Simple implementation</li>
+                            <li>Seamless compatibility (no server mods)</li>
+                        </ul>
+                        <p class="font-semibold text-red-600">👎 Cons:</p>
+                        <ul class="list-disc list-inside text-slate-600 text-sm space-y-1">
+                            <li>Detectable and can be blocked by servers</li>
+                            <li>Potential centralization at the proxy</li>
+                            <li>Trust needed in proxy not to collude</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="explorer" class="mb-16 md:mb-24 section-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Protocol Explorer</h2>
+                <p class="mt-3 max-w-2xl mx-auto text-lg text-slate-600">Select a protocol to see its characteristics, key features, and a visual comparison of its strengths. The chart values are qualitative scores from 1 (low) to 5 (high) based on the report analysis.</p>
+            </div>
+
+            <div id="protocol-selector" class="flex flex-wrap justify-center gap-2 mb-8"></div>
+            
+            <div id="protocol-display" class="bg-white p-6 md:p-8 rounded-xl shadow-lg border border-slate-100 min-h-[500px] transition-opacity duration-500">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 id="protocol-name" class="text-2xl md:text-3xl font-bold text-cyan-700 mb-3">Select a Protocol</h3>
+                        <p id="protocol-description" class="text-slate-600 mb-6">Details will be displayed here.</p>
+                        <div id="protocol-details" class="overflow-x-auto"></div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="protocol-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="trends" class="section-fade-in">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold text-slate-900">Emerging Trends & Future Outlook</h2>
+                <p class="mt-3 max-w-2xl mx-auto text-lg text-slate-600">zkTLS is evolving rapidly, with key trends shaping its future in Web3, AI, and enterprise adoption.</p>
+            </div>
+            
+            <div class="bg-white rounded-xl shadow-lg border border-slate-100 p-2">
+                <div class="flex flex-wrap border-b border-slate-200">
+                    <button data-tab="did" class="tab-button flex-auto px-4 py-3 font-semibold text-slate-500 focus:outline-none transition-colors duration-300">DID, DePIN & AI</button>
+                    <button data-tab="efficiency" class="tab-button flex-auto px-4 py-3 font-semibold text-slate-500 focus:outline-none transition-colors duration-300">Efficiency & Tooling</button>
+                    <button data-tab="adoption" class="tab-button flex-auto px-4 py-3 font-semibold text-slate-500 focus:outline-none transition-colors duration-300">Adoption Challenges</button>
+                </div>
+                <div id="tab-content-container" class="p-6">
+                    <div id="tab-content-did" class="tab-content space-y-4">
+                        <h4 class="font-bold text-lg text-cyan-700">Integration with DID, DePIN, and AI</h4>
+                        <p>zkTLS is becoming a foundational primitive for <strong>Decentralized Identity (DID)</strong>, allowing users to create verifiable credentials from their existing Web2 accounts. This enables private, self-sovereign identity claims for everything from DeFi to academic verification.</p>
+                        <p>In <strong>Decentralized Physical Infrastructure Networks (DePIN)</strong>, zkTLS can verify data from real-world devices (like sensors) without exposing sensitive location or user data, ensuring the integrity of data flowing from the physical world to the blockchain.</p>
+                        <p>For <strong>Artificial Intelligence (AI)</strong>, zkTLS can provide verifiable, untampered data inputs for training models and can help combat sybil attacks by ensuring interactions come from real, verified users.</p>
+                    </div>
+                    <div id="tab-content-efficiency" class="tab-content hidden space-y-4">
+                         <h4 class="font-bold text-lg text-cyan-700">Advancements in ZKP Efficiency and Developer Tooling</h4>
+                        <p>The practical use of zkTLS depends heavily on the speed of Zero-Knowledge Proof (ZKP) generation. Major advancements are focused on <strong>reducing proof generation time and memory usage</strong>, with some protocols achieving sub-second proofs directly in a web browser on standard hardware.</p>
+                        <p>The growth of robust <strong>developer tooling</strong>, including Software Development Kits (SDKs) and low-code integrations, is dramatically lowering the barrier to entry. These tools allow developers to incorporate zkTLS into their applications without needing deep cryptographic expertise, accelerating adoption.</p>
+                    </div>
+                    <div id="tab-content-adoption" class="tab-content hidden space-y-4">
+                        <h4 class="font-bold text-lg text-cyan-700">Challenges and Opportunities for Broader Adoption</h4>
+                        <p>Despite progress, challenges remain. High-volume applications can still be bottlenecked by <strong>performance and scalability</strong>. Proxy-based models face the risk of being <strong>blocked by Web2 servers</strong>, and MPC models have <strong>networking overhead</strong>.</p>
+                        <p><strong>Standardization and interoperability</strong> between different zkTLS protocols are needed for a truly composable web. Furthermore, a seamless <strong>user experience (UX)</strong> and clear <strong>regulatory frameworks</strong> are crucial for mainstream and enterprise adoption.</p>
+                        <p>The opportunities are immense, enabling new business models in DeFi, supply chain, and collaborative analytics that were previously impossible due to data silos and privacy concerns.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-100 border-t border-slate-200 mt-12">
+        <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
+            <p>Interactive visualization created from the "Advanced Zero-Knowledge Transport Layer Security Protocols" report.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const protocolData = {
+                'ZkPass': {
+                    description: 'A hybrid protocol that intelligently switches between Proxy and MPC modes to optimize for performance and security, acting as a gateway between Web2 and Web3 private data.',
+                    model: 'Hybrid (Proxy + MPC)',
+                    tls_support: 'All HTTPS Sessions',
+                    speed: '< 1 second',
+                    scores: { 'Security': 4, 'Privacy': 4, 'Performance': 5, 'Decentralization': 3, 'Maturity': 4 }
+                },
+                'DiStefano': {
+                    description: 'An efficient and maliciously-secure academic framework specifically designed and optimized for TLS 1.3, generating private commitments over web traffic.',
+                    model: 'DCTLS via 2PC',
+                    tls_support: 'TLS 1.3 Specific',
+                    speed: '< 1 second (online)',
+                    scores: { 'Security': 5, 'Privacy': 4, 'Performance': 4, 'Decentralization': 5, 'Maturity': 2 }
+                },
+                'DECO': {
+                    description: 'A pioneering decentralized oracle protocol that functions without trusted hardware or server-side modifications, liberating data from web silos.',
+                    model: 'MPC-like',
+                    tls_support: 'Modern TLS (1.2/1.3)',
+                    speed: 'Slower (~2.5s+)',
+                    scores: { 'Security': 4, 'Privacy': 5, 'Performance': 2, 'Decentralization': 5, 'Maturity': 3 }
+                },
+                'TLSNotary': {
+                    description: 'An open-source, MPC-based protocol from the Ethereum Foundation that provides privacy-preserving data portability through a network of "Notaries".',
+                    model: 'MPC-based',
+                    tls_support: 'TLS 1.2 (1.3 planned)',
+                    speed: 'Moderate Latency',
+                    scores: { 'Security': 5, 'Privacy': 4, 'Performance': 3, 'Decentralization': 4, 'Maturity': 4 }
+                },
+                'Reclaim Protocol': {
+                    description: 'A production-ready, proxy-based infrastructure that enables verified credentials from any website, prioritizing speed and ease of integration.',
+                    model: 'Proxy-based (Opaque)',
+                    tls_support: 'Any HTTPS Endpoint',
+                    speed: '< 4 seconds',
+                    scores: { 'Security': 3, 'Privacy': 3, 'Performance': 5, 'Decentralization': 2, 'Maturity': 5 }
+                },
+                'zkFetch': {
+                    description: 'A zkTLS-powered oracle solution built on Reclaim Protocol, designed to bring verified off-chain data to specific blockchain ecosystems like Arbitrum and Cardano.',
+                    model: 'Proxy-based (via Reclaim)',
+                    tls_support: 'Any HTTPS Endpoint',
+                    speed: '< 4 seconds',
+                    scores: { 'Security': 3, 'Privacy': 3, 'Performance': 5, 'Decentralization': 2, 'Maturity': 3 }
+                },
+                'expandZK': {
+                    description: 'An academic protocol with a strong focus on security, differentiating between public data and sensitive PII using an advanced suite of cryptographic tools.',
+                    model: 'Proxy-assisted',
+                    tls_support: 'Standard TLS',
+                    speed: 'Optimized',
+                    scores: { 'Security': 5, 'Privacy': 5, 'Performance': 3, 'Decentralization': 3, 'Maturity': 2 }
+                },
+                'Opacity Network': {
+                    description: 'A hybrid solution combining TEEs for speed and MPC with Eigenlayer AVS economic security to create a multi-layered, secure, and mobile-first product.',
+                    model: 'Hybrid (TEE + MPC)',
+                    tls_support: 'General HTTPS',
+                    speed: 'High (Claimed)',
+                    scores: { 'Security': 5, 'Privacy': 4, 'Performance': 4, 'Decentralization': 4, 'Maturity': 3 }
+                },
+                'sessionproof': {
+                    description: 'A proof-of-concept exploring non-interactive ZKPs for any TLS session, allowing users to prove account ownership without revealing credentials.',
+                    model: 'PoC (Proxy/HTTP Signatures)',
+                    tls_support: 'TLS Sessions',
+                    speed: 'N/A (PoC)',
+                    scores: { 'Security': 2, 'Privacy': 4, 'Performance': 2, 'Decentralization': 2, 'Maturity': 1 }
+                }
+            };
+
+            const selectorContainer = document.getElementById('protocol-selector');
+            const nameEl = document.getElementById('protocol-name');
+            const descriptionEl = document.getElementById('protocol-description');
+            const detailsEl = document.getElementById('protocol-details');
+            const displayContainer = document.getElementById('protocol-display');
+            
+            const chartCtx = document.getElementById('protocol-chart').getContext('2d');
+            let protocolChart;
+
+            function createChart() {
+                protocolChart = new Chart(chartCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['Security', 'Privacy', 'Performance', 'Decentralization', 'Maturity'],
+                        datasets: [{
+                            label: 'Protocol Score',
+                            data: [0, 0, 0, 0, 0],
+                            backgroundColor: 'rgba(8, 145, 178, 0.2)',
+                            borderColor: 'rgba(8, 145, 178, 1)',
+                            borderWidth: 2,
+                            pointBackgroundColor: 'rgba(8, 145, 178, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(8, 145, 178, 1)'
+                        }]
+                    },
+                    options: {
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                beginAtZero: true,
+                                max: 5,
+                                stepSize: 1,
+                                angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                                grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                                pointLabels: {
+                                    font: { size: 12, weight: 'bold' },
+                                    color: '#475569'
+                                },
+                                ticks: {
+                                    backdropColor: 'rgba(255, 255, 255, 0.75)',
+                                    color: '#64748b'
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.r !== null) {
+                                            label += context.parsed.r;
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            function updateDisplay(protocolKey) {
+                const data = protocolData[protocolKey];
+                if (!data) return;
+
+                displayContainer.style.opacity = '0';
+
+                setTimeout(() => {
+                    nameEl.textContent = protocolKey;
+                    descriptionEl.textContent = data.description;
+                    detailsEl.innerHTML = `
+                        <table class="w-full text-sm text-left text-slate-500">
+                            <tbody class="divide-y divide-slate-200">
+                                <tr class="bg-white">
+                                    <th scope="row" class="px-4 py-2 font-medium text-slate-900 whitespace-nowrap">Model</th>
+                                    <td class="px-4 py-2">${data.model}</td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <th scope="row" class="px-4 py-2 font-medium text-slate-900 whitespace-nowrap">TLS Support</th>
+                                    <td class="px-4 py-2">${data.tls_support}</td>
+                                </tr>
+                                <tr class="bg-white">
+                                    <th scope="row" class="px-4 py-2 font-medium text-slate-900 whitespace-nowrap">Proof Speed</th>
+                                    <td class="px-4 py-2">${data.speed}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    `;
+                    
+                    protocolChart.data.datasets[0].data = Object.values(data.scores);
+                    protocolChart.data.datasets[0].label = protocolKey;
+                    protocolChart.update();
+                    
+                    displayContainer.style.opacity = '1';
+
+                    document.querySelectorAll('#protocol-selector button').forEach(btn => {
+                        btn.classList.remove('bg-cyan-600', 'text-white', 'ring-2', 'ring-cyan-300');
+                        btn.classList.add('bg-white', 'text-cyan-700');
+                    });
+                    const activeBtn = document.querySelector(`button[data-protocol="${protocolKey}"]`);
+                    activeBtn.classList.remove('bg-white', 'text-cyan-700');
+                    activeBtn.classList.add('bg-cyan-600', 'text-white', 'ring-2', 'ring-cyan-300');
+
+                }, 200);
+            }
+
+            Object.keys(protocolData).forEach(key => {
+                const button = document.createElement('button');
+                button.textContent = key;
+                button.dataset.protocol = key;
+                button.className = 'px-4 py-2 border border-cyan-600 text-cyan-700 bg-white rounded-full text-sm font-semibold hover:bg-cyan-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 transition-all duration-200';
+                button.addEventListener('click', () => updateDisplay(key));
+                selectorContainer.appendChild(button);
+            });
+            
+            createChart();
+            updateDisplay('ZkPass');
+
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            function updateActiveTab(activeTab) {
+                 tabButtons.forEach(button => {
+                    const isSelected = button.dataset.tab === activeTab;
+                    button.classList.toggle('text-cyan-600', isSelected);
+                    button.classList.toggle('border-b-2', isSelected);
+                    button.classList.toggle('border-cyan-600', isSelected);
+                    button.classList.toggle('text-slate-500', !isSelected);
+                    button.classList.toggle('border-transparent', !isSelected);
+                });
+
+                tabContents.forEach(content => {
+                    content.classList.toggle('hidden', content.id !== `tab-content-${activeTab}`);
+                });
+            }
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                   updateActiveTab(button.dataset.tab);
+                });
+            });
+
+            updateActiveTab('did');
+
+            const sections = document.querySelectorAll('section');
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.3
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        navLinks.forEach(link => {
+                            link.classList.remove('active-nav');
+                            if (link.getAttribute('href').substring(1) === entry.target.id) {
+                                link.classList.add('active-nav');
+                            }
+                        });
+                    }
+                });
+            }, observerOptions);
+
+            sections.forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
+</body>
+</html>
