@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>zkTLS Toolboxes: A Visual Comparison for Secure Data Provenance</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 50vh;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 450px;
+            }
+        }
+        .gradient-text {
+            background: linear-gradient(90deg, #0066ff, #0044cc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .flow-arrow {
+            position: relative;
+            width: 100%;
+            height: 2px;
+            background-color: #99ccff;
+        }
+        .flow-arrow::after {
+            content: '►';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #3388ff;
+            font-size: 1.25rem;
+        }
+    </style>
+</head>
+<body class="text-gray-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+
+        <header class="text-center my-12 md:my-16">
+            <h1 class="text-4xl md:text-6xl font-black mb-4 gradient-text">Verifying the Web</h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">A Deep Dive into zkTLS Toolboxes for Secure Data Provenance</p>
+        </header>
+
+        <section id="problem" class="my-16">
+            <div class="bg-white rounded-2xl shadow-lg p-8 md:p-12 max-w-5xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-4">The Internet's Trust Problem</h2>
+                <p class="text-gray-600 leading-relaxed max-w-3xl mx-auto">
+                    Standard TLS (the 'S' in HTTPS) secures our data in transit, but it can't prove where that data came from. A user can't verifiably prove to a new app that they have a certain bank balance or are over 18 using data from their bank's website. This "provenance gap" limits data portability and the growth of trust-minimized Web3 applications.
+                </p>
+                <div class="mt-8 text-6xl">
+                    <span class="text-red-500">📜</span>
+                    <span class="text-gray-400 mx-4">≠</span>
+                    <span class="text-green-500">✔️</span>
+                </div>
+                 <p class="text-sm text-gray-500 mt-2">A screenshot isn't a verifiable proof.</p>
+            </div>
+        </section>
+        
+        <section id="solution" class="my-16">
+            <div class="bg-gradient-to-br from-[#0066ff] to-[#0044cc] text-white rounded-2xl shadow-xl p-8 md:p-12 max-w-5xl mx-auto text-center">
+                <h2 class="text-3xl font-bold mb-4">The Solution: Zero-Knowledge TLS (zkTLS)</h2>
+                <p class="leading-relaxed max-w-3xl mx-auto opacity-90">
+                    zkTLS bridges this gap. It combines the power of Zero-Knowledge Proofs with standard TLS, allowing a user to prove specific facts about data from any website ("My balance is over $10k") without revealing the sensitive data itself ("My exact balance is $12,345.67"). Best of all, it works without needing the website to change anything.
+                </p>
+            </div>
+        </section>
+
+        <section id="approaches" class="my-16">
+            <h2 class="text-3xl font-bold text-center mb-10">Three Core Approaches to zkTLS</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+                <div class="bg-white rounded-2xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
+                    <div class="text-4xl mb-4">🧠</div>
+                    <h3 class="text-xl font-bold mb-2 text-[#0044cc]">MPC / ZKP</h3>
+                    <p class="text-gray-600 text-sm">Relies on pure cryptography. Trust is distributed among multiple parties or based on mathematical proofs. No single entity is trusted.</p>
+                    <div class="mt-4 text-left text-xs">
+                        <p class="font-semibold text-green-600">+ Maximally trust-minimized</p>
+                        <p class="font-semibold text-green-600">+ Strong privacy guarantees</p>
+                        <p class="font-semibold text-red-600">- Higher computational overhead</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
+                     <div class="text-4xl mb-4">💻</div>
+                    <h3 class="text-xl font-bold mb-2 text-[#0044cc]">Trusted Hardware (TEE)</h3>
+                    <p class="text-gray-600 text-sm">Uses a secure, tamper-proof area within a CPU to process data. Trust is placed in the hardware manufacturer.</p>
+                     <div class="mt-4 text-left text-xs">
+                        <p class="font-semibold text-green-600">+ Very high performance</p>
+                        <p class="font-semibold text-green-600">+ Low computational overhead</p>
+                        <p class="font-semibold text-red-600">- Centralized hardware trust</p>
+                        <p class="font-semibold text-red-600">- Vulnerable to side-channel attacks</p>
+                    </div>
+                </div>
+                <div class="bg-white rounded-2xl shadow-lg p-6 text-center transform hover:scale-105 transition-transform duration-300">
+                     <div class="text-4xl mb-4">💰</div>
+                    <h3 class="text-xl font-bold mb-2 text-[#0044cc]">Economic Security</h3>
+                    <p class="text-gray-600 text-sm">Leverages blockchain staking and economic incentives. Security is based on making attacks prohibitively expensive.</p>
+                     <div class="mt-4 text-left text-xs">
+                        <p class="font-semibold text-green-600">+ Tunable, scalable security</p>
+                        <p class="font-semibold text-green-600">+ Seamless ecosystem integration</p>
+                        <p class="font-semibold text-red-600">- Security depends on economic model</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison" class="my-16">
+            <h2 class="text-3xl font-bold text-center mb-10">Toolbox Performance Showdown</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">Comparing the online/proof generation time of leading MPC/ZKP-based solutions. Lower is better, indicating a faster user experience.</p>
+            <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <section id="trust-spectrum" class="my-16">
+            <h2 class="text-3xl font-bold text-center mb-10">The Trust Spectrum</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">zkTLS solutions exist on a spectrum, trading off between pure cryptographic security and reliance on trusted hardware for performance.</p>
+            <div class="bg-white rounded-2xl shadow-lg p-8 md:p-12">
+                <div class="flex items-center justify-between">
+                    <div class="text-center w-1/4">
+                        <p class="font-bold text-[#0044cc]">Pure Cryptographic Trust</p>
+                        <p class="text-xs text-gray-500">(e.g., zkPass, DiStefano)</p>
+                    </div>
+                    <div class="flex-grow mx-4">
+                        <div class="flow-arrow"></div>
+                    </div>
+                    <div class="text-center w-1/4">
+                        <p class="font-bold text-[#0044cc]">Hardware-Backed Trust</p>
+                        <p class="text-xs text-gray-500">(e.g., TEEs / Clique)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="maturity" class="my-16">
+            <h2 class="text-3xl font-bold text-center mb-10">Maturity & Adoption Landscape</h2>
+            <p class="text-center text-gray-600 max-w-2xl mx-auto mb-12">Visualizing the relative maturity of different zkTLS projects based on funding, ecosystem development, and technical readiness.</p>
+             <div class="bg-white rounded-2xl shadow-lg p-6 md:p-8">
+                <div class="chart-container">
+                    <canvas id="maturityChart"></canvas>
+                </div>
+            </div>
+        </section>
+        
+        <section id="deep-dive" class="my-16">
+            <h2 class="text-3xl font-bold text-center mb-10">At a Glance: Toolbox Comparison</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold text-[#0066ff] mb-3">zkPass</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">A mature, well-funded protocol using a hybrid MPC/ZK system for fast, in-browser proofs.</p>
+                    <ul class="text-sm space-y-2">
+                        <li><span class="font-semibold text-gray-700">Key Feature:</span> Sub-second proofs</li>
+                        <li><span class="font-semibold text-gray-700">Primitive:</span> MPC + VOLE-ZK</li>
+                        <li><span class="font-semibold text-gray-700">Integration:</span> SDK & Browser Extension</li>
+                        <li><span class="font-semibold text-gray-700">TLS Support:</span> 1.2 / 1.3</li>
+                    </ul>
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <p class="text-3xl font-black text-center text-[#0044cc]">$15M</p>
+                        <p class="text-xs text-center text-gray-500">Total Funding</p>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold text-[#0066ff] mb-3">DiStefano</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">An efficient, maliciously-secure framework for TLS 1.3, integrated directly into BoringSSL (used by Chrome).</p>
+                    <ul class="text-sm space-y-2">
+                        <li><span class="font-semibold text-gray-700">Key Feature:</span> BoringSSL Integration</li>
+                        <li><span class="font-semibold text-gray-700">Primitive:</span> 2PC (Garbled Circuits)</li>
+                        <li><span class="font-semibold text-gray-700">Integration:</span> Direct library modification</li>
+                        <li><span class="font-semibold text-gray-700">TLS Support:</span> 1.3</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold text-[#0066ff] mb-3">DECO</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">A pioneering academic project proving the viability of ZKPs for TLS without trusted hardware.</p>
+                     <ul class="text-sm space-y-2">
+                        <li><span class="font-semibold text-gray-700">Key Feature:</span> Optimized ZK for TLS records</li>
+                        <li><span class="font-semibold text-gray-700">Primitive:</span> 3-Party Handshake + ZKP</li>
+                        <li><span class="font-semibold text-gray-700">Integration:</span> Research Implementation</li>
+                        <li><span class="font-semibold text-gray-700">TLS Support:</span> 1.2 / 1.3</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold text-[#0066ff] mb-3">TLSNotary</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">An open-source protocol focused on notarizing TLS data for privacy-preserving portability.</p>
+                     <ul class="text-sm space-y-2">
+                        <li><span class="font-semibold text-gray-700">Key Feature:</span> Open-source & community-driven</li>
+                        <li><span class="font-semibold text-gray-700">Primitive:</span> MPC (Garbled Circuits)</li>
+                        <li><span class="font-semibold text-gray-700">Integration:</span> Rust lib, NPM, Extension</li>
+                        <li><span class="font-semibold text-gray-700">TLS Support:</span> 1.2 (1.3 planned)</li>
+                    </ul>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold text-[#0066ff] mb-3">Opacity</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">An innovative approach using economic security from staking on Solana to secure data proofs.</p>
+                     <ul class="text-sm space-y-2">
+                        <li><span class="font-semibold text-gray-700">Key Feature:</span> Economic Security Model</li>
+                        <li><span class="font-semibold text-gray-700">Primitive:</span> Staking (Jito NCNs)</li>
+                        <li><span class="font-semibold text-gray-700">Integration:</span> Solana Ecosystem</li>
+                        <li><span class="font-semibold text-gray-700">TLS Support:</span> N/A (API-level)</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col">
+                    <h3 class="text-2xl font-bold text-[#0066ff] mb-3">TEE Solutions (Clique)</h3>
+                    <p class="text-sm text-gray-600 mb-4 flex-grow">Leverages trusted hardware for maximum efficiency, trading cryptographic trust for hardware guarantees.</p>
+                     <ul class="text-sm space-y-2">
+                        <li><span class="font-semibold text-gray-700">Key Feature:</span> Extreme performance</li>
+                        <li><span class="font-semibold text-gray-700">Primitive:</span> Trusted Execution Env.</li>
+                        <li><span class="font-semibold text-gray-700">Integration:</span> TEE-enabled server proxy</li>
+                        <li><span class="font-semibold text-gray-700">TLS Support:</span> 1.2 / 1.3</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
+        <footer class="text-center my-16">
+            <h2 class="text-3xl font-bold mb-4">Conclusion: Which Toolbox is Best?</h2>
+            <p class="text-gray-600 leading-relaxed max-w-3xl mx-auto mb-8">
+                There is no single "best" solution. The optimal choice depends on the specific use case, balancing security, performance, and trust assumptions.
+            </p>
+            <div class="max-w-3xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6 text-left">
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                    <h4 class="font-bold">For Maximum Security & Decentralization:</h4>
+                    <p class="text-sm text-gray-700 mt-1">Protocols like <strong class="text-[#0044cc]">zkPass</strong> and <strong class="text-[#0044cc]">DiStefano</strong> are recommended. They offer robust cryptographic guarantees and strong privacy features with minimal trust in external hardware.</p>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h4 class="font-bold">For Niche Ecosystems or High Speed:</h4>
+                    <p class="text-sm text-gray-700 mt-1"><strong class="text-[#0044cc]">Opacity</strong> is ideal for Solana-native apps, while <strong class="text-[#0044cc]">TEE-based</strong> solutions offer top performance if hardware trust is acceptable.</p>
+                </div>
+            </div>
+             <p class="text-xs text-gray-400 mt-12">Infographic based on deep research into zkTLS toolboxes. All data sourced from publicly available whitepapers and technical documentation as of late 2024. This visualization does not use SVG or Mermaid JS.</p>
+        </footer>
+
+    </div>
+
+    <script>
+        const wrapLabel = (str, maxWidth) => {
+            if (str.length <= maxWidth) {
+                return str;
+            }
+            const words = str.split(' ');
+            const lines = [];
+            let currentLine = '';
+            for (const word of words) {
+                if ((currentLine + word).length > maxWidth) {
+                    lines.push(currentLine.trim());
+                    currentLine = '';
+                }
+                currentLine += word + ' ';
+            }
+            lines.push(currentLine.trim());
+            return lines;
+        };
+
+        const tooltipTitleCallback = (tooltipItems) => {
+            const item = tooltipItems[0];
+            let label = item.chart.data.labels[item.dataIndex];
+            if (Array.isArray(label)) {
+                return label.join(' ');
+            } else {
+                return label;
+            }
+        };
+
+        const defaultChartOptions = {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        title: tooltipTitleCallback
+                    },
+                    backgroundColor: '#0044cc',
+                    titleFont: { size: 14, weight: 'bold' },
+                    bodyFont: { size: 12 },
+                    padding: 12,
+                    cornerRadius: 8,
+                    boxPadding: 4,
+                }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#6b7280', font: { size: 10 } },
+                    grid: { display: false },
+                    border: { color: '#e5e7eb' }
+                },
+                y: {
+                    ticks: { color: '#6b7280' },
+                    grid: { color: '#e5e7eb' },
+                    border: { display: false }
+                }
+            }
+        };
+
+        const performanceData = {
+            labels: ['zkPass (VOLE-ZK)', 'DiStefano (Online)', 'DECO (Online)', 'TEE-based (ODT)'],
+            datasets: [{
+                label: 'Online / Proof Time (ms)',
+                data: [210, 750, 2850, 144],
+                backgroundColor: ['#3388ff', '#3388ff', '#66aaff', '#0066ff'],
+                borderColor: '#0044cc',
+                borderWidth: 1,
+                borderRadius: 4,
+            }]
+        };
+
+        new Chart(document.getElementById('performanceChart'), {
+            type: 'bar',
+            data: performanceData,
+            options: {
+                ...defaultChartOptions,
+                indexAxis: 'y',
+                scales: {
+                    x: { ...defaultChartOptions.scales.x, title: { display: true, text: 'Time in Milliseconds (ms)' } },
+                    y: { ...defaultChartOptions.scales.y, ticks: { ...defaultChartOptions.scales.y.ticks, font: { size: 12 } } }
+                }
+            }
+        });
+
+        const maturityData = {
+            labels: ['zkPass', 'Opacity', 'DiStefano', 'TLSNotary', 'DECO', 'TEE (Clique)'],
+            datasets: [{
+                label: 'Maturity & Adoption',
+                data: [
+                    { x: 8, y: 9, r: 25 }, 
+                    { x: 7, y: 8, r: 20 }, 
+                    { x: 9, y: 5, r: 15 }, 
+                    { x: 6, y: 4, r: 12 }, 
+                    { x: 7, y: 3, r: 10 }, 
+                    { x: 5, y: 6, r: 18 }  
+                ],
+                backgroundColor: '#3388ff',
+                borderColor: '#0044cc',
+                hoverBackgroundColor: '#0066ff',
+                borderWidth: 2,
+            }]
+        };
+
+        new Chart(document.getElementById('maturityChart'), {
+            type: 'bubble',
+            data: maturityData,
+            options: {
+                ...defaultChartOptions,
+                plugins: {
+                    ...defaultChartOptions.plugins,
+                    tooltip: {
+                        ...defaultChartOptions.plugins.tooltip,
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += `(${context.raw.x}, ${context.raw.y})`;
+                                return label;
+                            },
+                             title: tooltipTitleCallback
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        ...defaultChartOptions.scales.x,
+                        title: { display: true, text: 'Technical Readiness & Features' },
+                        min: 0,
+                        max: 10
+                    },
+                    y: {
+                        ...defaultChartOptions.scales.y,
+                        title: { display: true, text: 'Ecosystem & Funding' },
+                        min: 0,
+                        max: 10
+                    }
+                }
+            }
+        });
+
+    </script>
+</body>
+</html>
